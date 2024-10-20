@@ -21,7 +21,7 @@ orderRoute.post(
 
     if (orderItems && orderItems.length === 0) {
       res.status(400);
-      throw new Error("no order items found");
+      throw new Error("No order items found");
     } else {
       const order = new Order({
         orderItems,
@@ -99,20 +99,20 @@ orderRoute.put(
 
 //order lists
 
-orderRoute.get(
-  "/",
-  protect,
-  asyncHandler(async (req, res) => {
+// orderRoute.get(
+//   "/",
+//   protect,
+//   asyncHandler(async (req, res) => {
 
-    const orders = await Order.find({ user: req.user._id }).sort({ _id: -1 });
-    if (orders) {
-      res.status(200).json(orders);
-    } else {
-      res.status(404);
-      throw new Error("Orders Not Found");
-    }
-  })
-);
+//     const orders = await Order.find({ user: req.user._id }).sort({ _id: -1 });
+//     if (orders) {
+//       res.status(200).json(orders);
+//     } else {
+//       res.status(404);
+//       throw new Error("Orders Not Found");
+//     }
+//   })
+// );
 
 
 

@@ -17,7 +17,7 @@ orderRoute.post(
       totalPrice,
       price,
     } = req.body;
-    console.log(orderItems)
+    console.log(orderItems);
 
     if (orderItems && orderItems.length === 0) {
       res.status(400);
@@ -71,24 +71,25 @@ orderRoute.get(
 
 //update order status for payment
 
-//order payment
-
+//order payment route
 orderRoute.put(
   "/:id/payment",
   protect,
   asyncHandler(async (req, res) => {
     const order = await Order.findById(req.params.id);
+    console.log(order);
     if (order) {
       order.isPaid = true;
       order.paidAt = Date.now();
       order.paymentResult = {
-        id: req.body.id,
-        status: req.body.status,
-        update_time: req.body.create_time,
-        email_address: req.body.payer.email_address,
+        id: req.body.paymentResult.id,
+        status: req.body.paymentResult.status,
+        updated_time: req.body.paymentResult.updated_time,
+        email_address: req.body.paymentResult.email_address,
       };
-      const updatedOrder = order.save();
-
+      console.log("Payment before saving:", order.paymentResult);
+      const updatedOrder = await order.save();
+      console.log(updatedOrder);
       res.status(200).json(updatedOrder);
     } else {
       res.status(404);
@@ -97,27 +98,22 @@ orderRoute.put(
   })
 );
 
-//order lists
+// order lists
 
-// orderRoute.get(
-//   "/",
-//   protect,
-//   asyncHandler(async (req, res) => {
+orderRoute.get(
+  "/",
+  protect,
+  asyncHandler(async (req, res) => {
+    const orders = await Order.find({ user: req.user._id }).sort({ _id: -1 });
+    if (orders) {
+      res.status(200).json(orders);
+    } else {
+      res.status(404);
+      throw new Error("Orders Not Found");
+    }
+  })
+);
 
-//     const orders = await Order.find({ user: req.user._id }).sort({ _id: -1 });
-//     if (orders) {
-//       res.status(200).json(orders);
-//     } else {
-//       res.status(404);
-//       throw new Error("Orders Not Found");
-//     }
-//   })
-// );
-
-
-
-//stripe payment 
-
-
+//stripe payment
 
 module.exports = orderRoute;

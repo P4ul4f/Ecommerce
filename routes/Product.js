@@ -24,4 +24,25 @@ productRoute.get(
   })
 );
 
+productRoute.post(
+  "/",
+  AsynHandler(async (req, res) => {
+    const { name, image, description, rating, numReview, price, countInStock } =
+      req.body;
+
+    const product = new Product({
+      name,
+      image,
+      description,
+      rating,
+      numReview,
+      price,
+      countInStock,
+    });
+
+    const createdProduct = await product.save();
+    res.status(201).json(createdProduct);
+  })
+);
+
 module.exports = productRoute;

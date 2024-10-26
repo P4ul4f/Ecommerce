@@ -51,6 +51,7 @@ userRoute.post(
           isAdmin: user.isAdmin,
           createdAt: user.createdAt,
         });
+        console.log(_id, name, email);
       } else {
         res.status(400);
         throw new Error("Invalid user data");

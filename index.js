@@ -2,6 +2,10 @@ const express = require("express");
 const app = express();
 const dotenv = require("dotenv");
 const products = require("./data/Products");
+const cors = require("cors");
+const path = require("path");
+const multer = require("multer");
+
 
 dotenv.config();
 
@@ -23,7 +27,13 @@ const userRoute = require("./routes/User");
 const productRoute = require("./routes/Product");
 const orderRoute = require("./routes/Order");
 
+//CORS
+app.use(cors());
+
 app.use(express.json());
+
+//middleware para subir archivos estáticos
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 //database seeder router
 app.use("/api/seed", databaseSeeder);
@@ -38,8 +48,34 @@ app.use("/api/products", productRoute);
 //route for orders
 app.use("/api/orders", orderRoute);
 
-app.listen(PORT || 8080, () => {
+// const cors = require('cors');
+// app.use(cors());
+
+// Configuración de multer para guardar archivos en el directorio 'uploads'
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads'); // Guarda en el directorio 'uploads'
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.originalname); // Usa el nombre original del archivo
+  }
+});
+
+const upload = multer({ storage: storage });
+
+// Ruta para subir una imagen
+app.post('/upload', upload.single('image'), (req, res) => {
+  res.json({ message: 'Imagen subida exitosamente', imageUrl: `/uploads/${req.file.originalname}` });
+});
+
+// Servir archivos estáticos (esto permite que las imágenes sean accesibles públicamente)
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+
+app.listen(PORT || 3000, () => {
   console.log(`server listening on port ${PORT}`);
 });
+
+
 
 //mongodb+srv://paulaferreyra24:<l4uNgLZdiJH6uJlb>@cluster0.gmhce.mongodb.net/react-node-app

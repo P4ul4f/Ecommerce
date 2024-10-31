@@ -1,7 +1,6 @@
 const express = require("express");
 const app = express();
 const dotenv = require("dotenv");
-const products = require("./data/Products");
 const cors = require("cors");
 const path = require("path");
 const multer = require("multer");
@@ -50,6 +49,12 @@ app.use("/api/orders", orderRoute);
 
 // const cors = require('cors');
 // app.use(cors());
+
+
+//paypal payment api for client key
+app.use("/api/config/paypal", (req, res) => {
+  res.send(process.env.PAYPAL_CLIENT_ID);
+});
 
 // Configuración de multer para guardar archivos en el directorio 'uploads'
 const storage = multer.diskStorage({

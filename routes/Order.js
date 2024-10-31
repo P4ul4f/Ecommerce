@@ -76,27 +76,41 @@ orderRoute.put(
   "/:id/payment",
   protect,
   asyncHandler(async (req, res) => {
-    const order = await Order.findById(req.params.id);
-    console.log(order);
+    const { paymentResult, shippingAddress } = req.body; // Extraer datos del cuerpo de la solicitud
+    const order = await Order.findById(req.params.id); // Buscar la orden por ID
+
     if (order) {
-      order.isPaid = true;
-      order.paidAt = Date.now();
-      order.paymentResult = {
-        id: req.body.paymentResult.id,
-        status: req.body.paymentResult.status,
-        updated_time: req.body.paymentResult.updated_time,
-        email_address: req.body.paymentResult.email_address,
-      };
-      console.log("Payment before saving:", order.paymentResult);
-      const updatedOrder = await order.save();
-      console.log(updatedOrder);
-      res.status(200).json(updatedOrder);
+      // Actualizar solo los campos necesarios
+      if (shippingAddress) {
+        order.shippingAddress = shippingAddress; // Actualizar la dirección de envío
+      } else {
+        console.log("Shipping address is missing."); // Manejo de error si no se proporciona la dirección
+      }
+
+      // Actualizar información del pago
+      if (paymentResult) {
+        order.isPaid = true; // Marcar la orden como pagada
+        order.paidAt = Date.now(); // Establecer la fecha de pago
+        order.paymentResult = {
+          id: paymentResult.id,
+          status: paymentResult.status,
+          updated_time: paymentResult.updated_time,
+          email_address: paymentResult.email_address,
+        };
+      } else {
+        console.log("Payment result is missing."); // Manejo de error si no se proporciona el resultado del pago
+      }
+
+      // Guardar los cambios en la base de datos
+      const updatedOrder = await order.save(); 
+      res.status(200).json(updatedOrder); // Enviar respuesta con la orden actualizada
     } else {
       res.status(404);
-      throw new Error("Order Not Found");
+      throw new Error("Order Not Found"); // Manejo de error si no se encuentra la orden
     }
   })
 );
+
 
 // order lists
 
